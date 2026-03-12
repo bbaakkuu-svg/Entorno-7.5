@@ -46,71 +46,65 @@ Representa el flujo temporal desde que el Socio pulsa el botón de confirmar.
 
 sequenceDiagram
     autonumber
-    %% Representación de Actor (Monigote) en lugar de simple participante
-    actor S as "Socio"
-    participant IW as "InterfazWeb"
-    participant GM as "BookingManager"
-    participant DB as "Database"
+    
+    %% Definición de participantes y actores
+    actor S as Socio
+    participant IW as InterfazWeb
+    participant GM as BookingManager
+    participant DB as Database
 
-    Note over S, DB El flujo es cronológico (de arriba hacia abajo)
-
-    %% Mensaje Síncrono (Flecha rellena) El emisor espera respuesta
-    S->>IW confirmarReserva()
+    %% Flujo de mensajes
+    S->>IW: confirmarReserva()
     activate S
     activate IW
-    Note right of S El socio inicia la acción. La activación indica el foco de control.
-
-    IW->>GM confirmBooking(memberId, classId)
+    Note right of S: El socio pulsa confirmar
+    
+    IW->>GM: confirmBooking(memberId, classId)
     activate GM
     
     GM->>DB: checkAvailability(classId)
     activate DB
-    %% Mensaje de Retorno (Línea discontinua): Devuelve el valor solicitado
-    DB-->>GM availabilityStatus
+    DB-->>GM: availabilityStatus
     deactivate DB
-    Note right of DB Retorno con el estado de ocupación
+    Note right of DB: Respuesta de disponibilidad
 
-    alt Is Available
-        Note over GM, DB Caso Hay plazas disponibles (Fragmento Combinado Alt)
-        GM->>DB createBooking(memberId, classId)
+    alt Hay plazas (Is Available)
+        GM->>DB: createBooking(memberId, classId)
         activate DB
-        DB-->>GM success
+        DB-->>GM: success
         deactivate DB
         
         GM-->>IW: bookingConfirmed
-        deactivate GM
-        
-        IW-->>S: Mostrar mensaje de éxito
-        deactivate IW
-        deactivate S
-    else Is Full
-        Note over GM, DB Caso La clase está llena
-        GM-->>IW bookingFailed(Full)
-        activate GM
-        deactivate GM
-        
-        IW-->>S Mostrar mensaje de clase llena/Lista de espera
-        activate IW
-        deactivate IW
+        IW-->>S: Mostrar éxito
+    else Clase llena (Is Full)
+        GM-->>IW: bookingFailed(Full)
+        IW-->>S: Mostrar error / Lista espera
     end
+
+    deactivate GM
+    deactivate IW
+    deactivate S
 ```
 
 ### Tarea 3: Diagrama de Comunicación
 
 Este diagrama muestra la misma interacción pero enfocada en las relaciones de los objetos y el orden de los mensajes.
 
-```mermaid
-graph LR
-    %% Orquestación de objetos para procesar la reserva
-    S[:Socio] -- "1: confirmReservation()" --> IW[:InterfazWeb]
-    IW -- "2: processBooking(mId, cId)" --> GM[:BookingManager]
-    GM -- "3: checkCapacity(cId)" --> DB[:Database]
-    DB -- "3.1: capacityResponse" --> GM
-    %% Rama condicional si el aforo es suficiente
-    GM -- "4 [if OK]: createBooking(mId, cId)" --> DB
-    GM -- "5: notifyResult(status)" --> IW
-    IW -- "5.1: showMessage()" --> S
-```
+flowchart LR
+    %% Definición de los objetos involucrados
+    O1["Socio"]
+    O2["InterfazWeb"]
+    O3["BookingManager"]
+    O4["Database"]
+
+    %% Enlaces con mensajes numerados
+    O1 -- "1: confirmReservation()" --> O2
+    O2 -- "2: processBooking()" --> O3
+    O3 -- "3: checkCapacity()" --> O4
+    O4 -. "3.1: status" .-> O3
+    O3 -- "4 [if OK]: createBooking()" --> O4
+    O3 -. "5: notifyResult()" .-> O2
+    O2 -. "5.1: showMessage()" .-> O1
 
 ## Fase 3: Lógica del Proceso
 
