@@ -44,26 +44,53 @@ graph LR
 
 Representa el flujo temporal desde que el Socio pulsa el botón de confirmar.
 
-```mermaid
 sequenceDiagram
-    participant S as "Socio"
-    participant IW as "InterfazWeb"
-    participant GM as "BookingManager"
-    participant DB as "Database"
+    autonumber
+    participant S as Socio
+    participant IW as InterfazWeb
+    participant GM as BookingManager
+    participant DB as Database
 
+    Note over S, DB: El flujo es cronológico (de arriba hacia abajo)
+
+    %% Mensaje Síncrono (Flecha rellena): El emisor espera respuesta
     S->>IW: confirmarReserva()
+    activate S
+    activate IW
+    Note right of S: El socio inicia la acción. La activación indica el foco de control.
+
     IW->>GM: confirmBooking(memberId, classId)
+    activate GM
+    
     GM->>DB: checkAvailability(classId)
+    activate DB
+    %% Mensaje de Retorno (Línea discontinua): Devuelve el valor solicitado
     DB-->>GM: availabilityStatus
+    deactivate DB
+    Note right of DB: Retorno con el estado de ocupación
 
     alt Is Available
+        Note over GM, DB: Caso: Hay plazas disponibles (Fragmento Combinado Alt)
         GM->>DB: createBooking(memberId, classId)
+        activate DB
         DB-->>GM: success
+        deactivate DB
+        
         GM-->>IW: bookingConfirmed
+        deactivate GM
+        
         IW-->>S: Mostrar mensaje de éxito
+        deactivate IW
+        deactivate S
     else Is Full
+        Note over GM, DB: Caso: La clase está llena
         GM-->>IW: bookingFailed(Full)
+        activate GM
+        deactivate GM
+        
         IW-->>S: Mostrar mensaje de clase llena/Lista de espera
+        activate IW
+        deactivate IW
     end
 ```
 
