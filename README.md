@@ -37,3 +37,33 @@ graph LR
     ActorAdmin --> UC_ManageClasses
     ActorAdmin --> UC_CancelSession
 ```Entorno-7.5
+
+## Fase 2: Diseño de la Interacción
+
+### Tarea 2: Diagrama de Secuencia "Confirmar Reserva"
+
+Representa el flujo temporal desde que el Socio pulsa el botón de confirmar.
+
+```mermaid
+sequenceDiagram
+    participant S as :Socio
+    participant IW as :InterfazWeb
+    participant GM as :BookingManager
+    participant DB as :Database
+
+    S->>IW: confirmarReserva()
+    IW->>GM: confirmBooking(memberId, classId)
+    GM->>DB: checkAvailability(classId)
+    DB-->>GM: availabilityStatus
+
+    alt Is Available
+        GM->>DB: createBooking(memberId, classId)
+        DB-->>GM: success
+        GM-->>IW: bookingConfirmed
+        IW-->>S: Mostrar mensaje de éxito
+    else Is Full
+        GM-->>IW: bookingFailed(Full)
+        IW-->>S: Mostrar mensaje de clase llena/Lista de espera
+    end
+```
+
