@@ -17,7 +17,7 @@ El siguiente diagrama describe las interacciones entre los actores y el sistema.
 ```mermaid
 
 graph LR
-    subgraph SystemBoundary [Gimnasio GymMaster]
+    subgraph SystemBoundary ["Gimnasio GymMaster"]
         UC_Login(Login)
         UC_Reserve(Reserve Class)
         UC_Waitlist(Join Waiting List)
