@@ -106,3 +106,28 @@ flowchart TD
     Block --> Email["5. Enviar email de<br/>confirmación<br/>(Send Confirmation Email)"]
     Email --> End((Fin))
 ```
+
+## Fase 4: Ciclo de Vida del Objeto
+
+### Tarea 5: Diagrama de Estados del Objeto "Reserva" (Booking)
+
+Define los estados por los que pasa una reserva y los eventos que disparan la transición.
+
+```mermaid
+stateDiagram-v2
+    %% Ciclo de vida: de la creación al cierre
+    [*] --> Pending : requestBooking()
+  
+    Pending --> Confirmed : confirm()
+    Pending --> Cancelled : cancel()
+  
+    %% Transiciones después de la confirmación
+    Confirmed --> Attended : checkIn()
+    Confirmed --> Cancelled : cancel()
+    Confirmed --> NoShow : gracePeriodExpired()
+  
+    %% Estados finales
+    Attended --> [*]
+    Cancelled --> [*]
+    NoShow --> [*]
+```
