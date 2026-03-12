@@ -46,10 +46,10 @@ Representa el flujo temporal desde que el Socio pulsa el botón de confirmar.
 
 ```mermaid
 sequenceDiagram
-    participant S as ":Socio"
-    participant IW as ":InterfazWeb"
-    participant GM as ":BookingManager"
-    participant DB as ":Database"
+    participant S as "Socio"
+    participant IW as "InterfazWeb"
+    participant GM as "BookingManager"
+    participant DB as "Database"
 
     S->>IW: confirmarReserva()
     IW->>GM: confirmBooking(memberId, classId)
