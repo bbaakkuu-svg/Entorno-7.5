@@ -47,10 +47,10 @@ Representa el flujo temporal desde que el Socio pulsa el botón de confirmar.
 sequenceDiagram
     autonumber
     %% Representación de Actor (Monigote) en lugar de simple participante
-    actor S as :Socio
-    participant IW as :InterfazWeb
-    participant GM as :BookingManager
-    participant DB as :Database
+    actor S as "Socio"
+    participant IW as "InterfazWeb"
+    participant GM as "BookingManager"
+    participant DB as "Database"
 
     Note over S, DB: El flujo es cronológico (de arriba hacia abajo)
 
