@@ -29,14 +29,14 @@ graph LR
         UC_ManageClasses -.-> |"<<include>>"| UC_Login
         UC_CancelSession -.-> |"<<include>>"| UC_Login
     end
-
+```
     ActorMember((Socio))
     ActorAdmin((Administrador))
 
     ActorMember --> UC_Reserve
     ActorAdmin --> UC_ManageClasses
     ActorAdmin --> UC_CancelSession
-```Entorno-7.5
+```
 
 ## Fase 2: Diseño de la Interacción
 
