@@ -67,3 +67,19 @@ sequenceDiagram
     end
 ```
 
+### Tarea 3: Diagrama de Comunicación
+
+Este diagrama muestra la misma interacción pero enfocada en las relaciones de los objetos y el orden de los mensajes.
+
+```mermaid
+graph LR
+    %% Orquestación de objetos para procesar la reserva
+    S[:Socio] -- "1: confirmReservation()" --> IW[:InterfazWeb]
+    IW -- "2: processBooking(mId, cId)" --> GM[:BookingManager]
+    GM -- "3: checkCapacity(cId)" --> DB[:Database]
+    DB -- "3.1: capacityResponse" --> GM
+    %% Rama condicional si el aforo es suficiente
+    GM -- "4 [if OK]: createBooking(mId, cId)" --> DB
+    GM -- "5: notifyResult(status)" --> IW
+    IW -- "5.1: showMessage()" --> S
+```
