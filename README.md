@@ -105,6 +105,8 @@ flowchart LR
     O3 -- "4 [if OK]: createBooking()" --> O4
     O3 -. "5: notifyResult()" .-> O2
     O2 -. "5.1: showMessage()" .-> O1
+    end
+    ```
 
 ## Fase 3: Lógica del Proceso
 
@@ -127,6 +129,7 @@ flowchart TD
   
     Block --> Email["5. Enviar email de<br/>confirmación<br/>(Send Confirmation Email)"]
     Email --> End((Fin))
+    end
 ```
 
 ## Fase 4: Ciclo de Vida del Objeto
