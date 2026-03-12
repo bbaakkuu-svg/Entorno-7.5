@@ -94,10 +94,10 @@ Muestra el flujo lógico interno antes de consolidar la reserva.
 flowchart TD
     %% Flujo lógico de validación de negocio
     Start((Inicio)) --> Rec["1. Recibir solicitud<br/>(Receive Request)"]
-    Rec --> DecPaid{¿Socio tiene<br/>cuota pagada?<br/>(Has Paid Fee?)}
+    Rec --> DecPaid{"¿Socio tiene<br/>cuota pagada?<br/>(Has Paid Fee?)"}
   
     DecPaid -- No --> EndError((Fin - Error Pago))
-    DecPaid -- Sí --> DecCap{¿Hay aforo?<br/>(Is Capacity Available?)}
+    DecPaid -- Sí --> DecCap{"¿Hay aforo?<br/>(Is Capacity Available?)"}
   
     %% Gestión de excepciones de aforo
     DecCap -- No --> EndFull((Fin - Sugerir<br/>Lista Espera))
