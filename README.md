@@ -24,10 +24,10 @@ graph LR
         UC_ManageClasses(Manage Classes)
         UC_CancelSession(Cancel Session)
 
-        UC_Reserve -.-> |"<<include>>"| UC_Login
-        UC_Waitlist -.-> |"<<extend>>"| UC_Reserve
-        UC_ManageClasses -.-> |"<<include>>"| UC_Login
-        UC_CancelSession -.-> |"<<include>>"| UC_Login
+        UC_Reserve -.-> |&lt;&lt;include&gt;&gt;| UC_Login
+        UC_Waitlist -.-> |&lt;&lt;extend&gt;&gt;| UC_Reserve
+        UC_ManageClasses -.-> |&lt;&lt;include&gt;&gt;| UC_Login
+        UC_CancelSession -.-> |&lt;&lt;include&gt;&gt;| UC_Login
     end
 
     ActorMember((Socio))
@@ -43,10 +43,10 @@ graph LR
 ### Tarea 2: Diagrama de Secuencia "Confirmar Reserva"
 
 Representa el flujo temporal desde que el Socio pulsa el botón de confirmar.
-
+ ```mermaid
 sequenceDiagram
     autonumber
-    
+   
     %% Definición de participantes y actores
     actor S as Socio
     participant IW as InterfazWeb
@@ -90,47 +90,97 @@ sequenceDiagram
 
 Este diagrama muestra la misma interacción pero enfocada en las relaciones de los objetos y el orden de los mensajes.
 
-flowchart LR
-    %% Definición de los objetos involucrados
-    O1["Socio"]
-    O2["InterfazWeb"]
-    O3["BookingManager"]
-    O4["Database"]
+```mermaid
+graph LR
 
-    %% Enlaces con mensajes numerados
-    O1 -- "1: confirmReservation()" --> O2
-    O2 -- "2: processBooking()" --> O3
-    O3 -- "3: checkCapacity()" --> O4
-    O4 -. "3.1: status" .-> O3
-    O3 -- "4 [if OK]: createBooking()" --> O4
-    O3 -. "5: notifyResult()" .-> O2
-    O2 -. "5.1: showMessage()" .-> O1
-    end
-    ```
+%% Definición de los objetos
+Member((:Member))
+WebInterface((:WebInterface))
+ReservationManager((:ReservationManager))
+Database((:Database))
+
+%% --- FLUJO PRINCIPAL ---
+Member
+-- "1: confirmReservation()"
+--> WebInterface
+
+WebInterface
+-- "1.1: processReservation(memberId, classId)"
+--> ReservationManager
+
+ReservationManager
+-- "1.1.1: checkAvailability(classId)"
+--> Database
+
+Database
+-- "1.1.2: availabilityStatus"
+--> ReservationManager
+
+
+%% --- ALTERNATIVA A: Hay hueco (isAvailable=true) ---
+ReservationManager
+-- "1.1.3a: [isAvailable=true] blockSpot(memberId, classId)"
+--> Database
+
+Database
+-- "1.1.4a: [isAvailable=true] successConfirmation"
+--> ReservationManager
+
+ReservationManager
+-- "1.1.5a: [isAvailable=true] notifySuccess()"
+--> WebInterface
+
+WebInterface
+-- "1.1.6a: [isAvailable=true] showSuccessMessage()"
+--> Member
+
+
+%% --- ALTERNATIVA B: Clase llena (isAvailable=false) ---
+ReservationManager
+-- "1.1.3b: [isAvailable=false] notifyFullCapacity()"
+--> WebInterface
+
+WebInterface
+-- "1.1.4b: [isAvailable=false] showWaitlistOption()"
+--> Member
+```
+
+---
+
 
 ## Fase 3: Lógica del Proceso
 
 ### Tarea 4: Diagrama de Actividades "Validación de Reserva"
 
 Muestra el flujo lógico interno antes de consolidar la reserva.
-
+* **Pasos:** 1. Recibir solicitud -> 2. ¿Socio tiene cuota pagada? (Decisión) -> 3. ¿Hay aforo? (Decisión) -> 4. Bloquear plaza -> 5. Enviar email de confirmación.
+* Usa correctamente los símbolos de inicio, fin, acciones y rombos de decisión.
+* 
 ```mermaid
-flowchart TD
-    %% Flujo lógico de validación de negocio
-    Start((Inicio)) --> Rec["1. Recibir solicitud<br/>(Receive Request)"]
-    Rec --> DecPaid{"¿Socio tiene<br/>cuota pagada?<br/>(Has Paid Fee?)"}
-  
-    DecPaid -- No --> EndError((Fin - Error Pago))
-    DecPaid -- Sí --> DecCap{"¿Hay aforo?<br/>(Is Capacity Available?)"}
-  
-    %% Gestión de excepciones de aforo
-    DecCap -- No --> EndFull((Fin - Sugerir<br/>Lista Espera))
-    DecCap -- Sí --> Block["4. Bloquear plaza<br/>(Block Spot)"]
-  
-    Block --> Email["5. Enviar email de<br/>confirmación<br/>(Send Confirmation Email)"]
-    Email --> End((Fin))
-    end
+stateDiagram-v2
+    
+%% Decisiones
+state if_fee <<choice>>
+state if_capacity <<choice>>
+
+%% Flujo
+[*] --> ReceiveRequest
+ReceiveRequest --> if_fee
+    
+%% Primera Decisión: Cuota
+if_fee --> if_capacity : [fee paid]
+if_fee --> RejectUnpaid : [unpaid fee]
+    
+%% Segunda Decisión: Aforo
+if_capacity --> BlockSpot : [capacity]
+if_capacity --> RejectFull : [no capacity]
+    
+%% Finalización exitosa
+BlockSpot --> SendConfirmationEmail
+SendConfirmationEmail --> [*]
 ```
+
+---
 
 ## Fase 4: Ciclo de Vida del Objeto
 
@@ -156,3 +206,4 @@ stateDiagram-v2
     Cancelled --> [*]
     NoShow --> [*]
 ```
+
